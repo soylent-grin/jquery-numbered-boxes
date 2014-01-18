@@ -1,0 +1,31 @@
+* {
+  box-sizing: border-box;
+}
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+.container {
+  background-color: #333;
+}
+.numberedBox {
+  display: inline-block;
+  height: 100px;
+  background-color: green;
+  color: white;
+  font-family: PT-Sans, Arial, sans-serif;
+  border: 1px solid #AEF5FF;
+}
+.numberedBox h1 {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  font-weight: normal;
+  font-size: 12px;
+}
+.numberedBox:nth-of-type(2n) {
+  background-color: #999;
+}
