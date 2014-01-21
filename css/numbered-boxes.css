@@ -10,19 +10,18 @@ html {
   background-color: #333;
 }
 .numberedBox {
-  display: inline-block;
+  display: table;
+  float: left;
   height: 100px;
   background-color: green;
   color: white;
-  font-family: PT-Sans, Arial, sans-serif;
+  font-family: Arial, sans-serif;
   border: 1px solid #AEF5FF;
 }
-.numberedBox h1 {
-  display: inline-block;
-  vertical-align: middle;
+.numberedBox span {
   text-align: center;
-  width: 100%;
-  height: 100%;
+  display: table-cell;
+  vertical-align: middle;
   font-weight: normal;
   font-size: 12px;
 }

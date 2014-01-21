@@ -16,11 +16,13 @@
     },
     container = $('<div />').addClass('container')
                             .css({
-                                'padding':'40px'
+                                'padding':'40px',
                             });
      
-    $.fn.numberedBoxes = function( params ) {    
+    $.fn.numberedBoxes = function( params ) {   
+
         options = $.extend(options, params);
+
         init();
         calculate();
 
@@ -31,31 +33,31 @@
         });
 
         return container;
+
     };
 
     function init() {      
 
         for (var i = 1; i <= options.number; i++)
         {
-            container.append("<div class='numberedBox'><h1>" + i + "</h1></div>")
+            container.append("<div class='numberedBox'><span>" + i + "</span></div>")
         }
 
-        container.find('.numberedBox').css({'margin': options.box_margin/2 + 'px '});
+        container.find('.numberedBox').css({'margin-left': options.box_margin + 'px ',
+                                            'margin-bottom': options.box_margin + 'px '});
        
         $('body').append(container);
 
     };
 
-    function calculate() { 
+    function calculate() {
+        //detach DOM element 
         var tmpContainer = container.clone(true),
-            newBoxHeight,
-            //newPaddingLR, newPaddingTB,
+            newBoxHeight, newBoxWidth,
             containerPaddingLR = parseInt (container.css('padding-left'), 10),
-            containerPaddingTB = parseInt (container.css('padding-right'), 10),
-            contW = $(window).width() - 2 * 40,
-            contH = $(window).height() - 2 * 40,
-            containerSquare,
-            a,b,c,
+            containerPaddingTB = parseInt (container.css('padding-bottom'), 10),
+            contW = $(window).width() - 2 * containerPaddingLR,
+            contH = $(window).height() - 2 * containerPaddingTB,
             rows, cols;
 
         tmpContainer.css({
@@ -63,48 +65,35 @@
             'height': $(window).height(),
         });
 
-        //calculate primary height and  width of boxes, according to the square of container 
+        // get current number of columns and rows
+        // boxes are always fit in width
+        // h = w / ratio
+        // columns * w = contw
+        // rows * h <= contH
 
-        // n * ((height + box_margin) * (height*ratio + box_margin)) = contW * contH;
-        // height^2 * ratio + height * box_margin * ( ratio + 1 ) + box_margin * 2 - (contW * contH) / n = 0;
-        // height^2 * a + height * b + c = 0
-        containerSquare = contW * contH;
-        a = options.ratio;
-        b = (options.ratio + 1) * options.box_margin;
-        c = (options.box_margin * options.box_margin) - containerSquare / options.number;  
-        newBoxHeight =  Math.floor(( b*(-1) + Math.sqrt(b*b - 4*a*c) ) / (2*a));
-
-        //get current number of columns and rows
         cols = 1;
-        while ((newBoxHeight * options.ratio + options.box_margin) * cols < contW )
+        while ((contW/(cols*options.ratio)) * Math.ceil(options.number/cols) >= contH )
         {
             cols++; 
-        }   
+        }  
+        rows = Math.ceil(options.number/cols);
 
-        rows = Math.ceil(options.number/--cols);
+        // additional box margin
 
-        //fix if overflow
+        newBoxHeight = ((contW / cols)) / options.ratio - options.box_margin;
+        newBoxWidth =  ((contW / cols)) - options.box_margin;
 
-        if ((newBoxHeight + options.box_margin) * rows > contH)
-        {
-            newBoxHeight = (contW / ++cols - options.box_margin) / options.ratio;
-        }
-
-        /*
-        console.log(cols,rows);
-        newPaddingTB = ( $(window).height() - rows * (newBoxHeight + options.box_margin)) / 2;        
-        newPaddingLR = ( $(window).width() - cols * (newBoxHeight*options.ratio + options.box_margin)) / 2; 
-        console.log(rows * (newBoxHeight + options.box_margin));
-        container.css({
-            'padding-left': newPaddingLR,
-            'padding-right': newPaddingLR,
-            'padding-top': newPaddingTB,
-            'padding-bottom': newPaddingTB,
-        });
-        */
         tmpContainer.find('.numberedBox').css({
             'height': newBoxHeight,
-            'width': newBoxHeight*options.ratio
+            'width': newBoxWidth
+        });
+
+        // set new top and bottom padding of the container, according to unused space
+
+        containerPaddingTB = containerPaddingTB + (contH - rows*(newBoxHeight + options.box_margin))/2;
+        tmpContainer.css({
+            'padding-top': containerPaddingTB,
+            'padding-bottom': containerPaddingTB
         });
 
         $('.container').replaceWith(tmpContainer);
